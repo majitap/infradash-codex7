@@ -1,8 +1,6 @@
-import type { Metadata } from "next"
-import { TopologyView } from "@/components/views/topology-view"
-
-export const metadata: Metadata = { title: "인프라 구성도" }
-
+import type { Metadata } from "next";
+import { SystemsView } from "@/components/relay/systems";
+export const metadata: Metadata = { title: "Systems" };
 export default function TopologyPage() {
-  return <TopologyView />
+  return <SystemsView />;
 }

@@ -34,7 +34,7 @@ export function DataConnect({ compact = false }: { compact?: boolean }) {
     );
     const a = document.createElement("a");
     a.href = href;
-    a.download = "인프라대시-데이터-예시.json";
+    a.download = "relay-sample.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(href), 1000);
   }
@@ -55,7 +55,7 @@ export function DataConnect({ compact = false }: { compact?: boolean }) {
             </span>
             <DialogTitle>내 데이터로 시작하기</DialogTitle>
             <DialogDescription>
-              개요의 지표, 실행 내역, 구성 요소와 알림을 함께 불러옵니다.
+              Overview · Delivery · Systems · Signals 네 화면에 함께 반영됩니다.
             </DialogDescription>
           </DialogHeader>
           <div className="six-import-box">
@@ -143,7 +143,7 @@ export function DataConnect({ compact = false }: { compact?: boolean }) {
               예시 파일 받기
             </button>
             <a
-              href="https://github.com/majitap/infradash-codex6/blob/main/docs/START-HERE.md"
+              href="https://github.com/majitap/infradash-codex7/blob/main/docs/START-HERE.md"
               target="_blank"
               rel="noreferrer"
             >
@@ -163,8 +163,8 @@ export function DataConnect({ compact = false }: { compact?: boolean }) {
             )}
           </div>
           <p className="six-connect-note">
-            개요 외 분석 화면은 예시 데이터입니다. 실제 라이선스·연결 상태·로그
-            조회는 관리자의 연동 설정에서 별도로 연결합니다.
+            Explore의 확장 분석 화면은 예시 데이터입니다. 상세 로그와 외부
+            시스템 조회는 Connections에서 별도로 연결합니다.
           </p>
         </DialogContent>
       </Dialog>

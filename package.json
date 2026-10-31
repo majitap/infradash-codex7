@@ -1,5 +1,5 @@
 {
-  "name": "infradash-codex6",
+  "name": "infradash-codex7",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -48,5 +48,5 @@
     "tsx": "^4.20.6",
     "typescript": "^5"
   },
-  "description": "한글과 8px 그리드로 다듬은 깃랩 인프라 운영 대시보드"
+  "description": "relay — Infrastructure, in perspective. A considered workspace for GitLab infrastructure."
 }

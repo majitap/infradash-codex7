@@ -125,7 +125,7 @@ export function IntegrationsView() {
         <div className="ops-inline">
           <a
             className="ops-button"
-            href="https://github.com/majitap/infradash-codex6/blob/main/docs/OPERATIONS-SETUP.md"
+            href="https://github.com/majitap/infradash-codex7/blob/main/docs/OPERATIONS-SETUP.md"
             target="_blank"
             rel="noreferrer"
           >

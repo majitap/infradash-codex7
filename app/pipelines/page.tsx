@@ -1,9 +1,6 @@
-import type { Metadata } from "next"
-
-import { PipelinesView } from "@/components/views/pipelines-view"
-
-export const metadata: Metadata = { title: "파이프라인" }
-
+import type { Metadata } from "next";
+import { DeliveryView } from "@/components/relay/delivery";
+export const metadata: Metadata = { title: "Delivery" };
 export default function PipelinesPage() {
-  return <PipelinesView />
+  return <DeliveryView />;
 }

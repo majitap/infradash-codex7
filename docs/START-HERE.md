@@ -1,8 +1,8 @@
 # 내 데이터로 시작하기
 
-배포 주소: https://majitap.github.io/infradash-codex6/
+배포 주소: https://majitap.github.io/infradash-codex7/
 
-첫 접속은 **예시 모드**입니다. 상단의 `952/1000`도 예시 수치입니다. 실제 연결을 설정하지 않았는데 정상으로 표시하거나, 수집하지 않은 값을 임의로 만들지 않습니다.
+첫 접속은 **Demo workspace**입니다. 화면의 실행·용량·신호는 모두 예시 수치입니다. 실제 연결을 설정하지 않았는데 정상으로 표시하거나, 수집하지 않은 값을 임의로 만들지 않습니다. Relay의 네 주요 화면은 동일한 수집 결과를 공유합니다.
 
 ## 1. 내일 바로 파일로 시작
 
@@ -52,16 +52,19 @@ GITLAB_LICENSE_READ_TOKEN=
 | `runners` | `{online, offline, paused, capacity, busy}`. 용량·실행 수 미수집은 `null` |
 | `queueSeconds` | 평균 대기 시간 또는 `null` |
 | `pipelines` | `{id, project, ref, status, durationSeconds, startedAt}` 배열 |
-| `services` | `{id, name, role, state, detail}` 배열. 개요는 처음 5개 표시 |
+| `services` | `{id, name, role, state, detail}` 배열, 최대 20개. 선택 필드 `cpu`, `memory`는 0~100%, `latencyMs`는 0 이상 |
+| `connections` | 선택 필드. `{from, to}` 배열, 최대 100개. 등록된 서비스 ID 사이의 실제 연결만 지정. 생략하면 선 없이 구성 요소만 표시 |
 | `alerts` | `{id, title, detail, severity}` 배열. 심각도는 `critical`, `warning`, `info` |
 
 숫자는 음수를 허용하지 않습니다. 파일 크기는 2MB 이하입니다. 서비스와 알림이 없으면 빈 배열을 사용합니다. 실제 서비스 구성 요소 사이의 연결을 추측해 선으로 그리지 않습니다.
 
 ## 4. 현재 실제 데이터 범위
 
-- **전체 현황**: 위 JSON으로 지표, 차트, 실행 상세, 구성 요소, 알림, 라이선스를 표시합니다.
+- **Overview · Delivery · Systems · Signals**: 위 JSON으로 지표, 차트, 실행 상세, 시스템 맵·목록, 신호와 라이선스를 표시합니다. 실행 검색·필터·내보내기와 시스템 검색도 같은 데이터에 적용됩니다.
 - **깃랩 연결 상태·라이선스 상세·관리자·로그**: 기존 보호된 운영 서버를 별도로 연결하면 실제 데이터를 사용합니다.
-- **프로젝트·배포 상세 분석·인프라 구성도·비용 등 나머지 화면**: 기존 예시 분석입니다. 각 화면에 예시 표시가 있으며 개요 파일과 자동 연결되지 않습니다.
+- **Explore의 프로젝트·비용·보안 및 기존 확장 분석 화면**: 예시 분석입니다. 네 주요 화면의 수집 파일과 자동 연결되지 않습니다.
+
+Signals의 확인 표시는 개인의 브라우저 메모리에만 저장되며, 실제 장애나 GitLab 상태를 변경하지 않습니다. 새 수집 시각의 스냅샷이나 새로고침에서는 초기화됩니다. 파일을 가져오는 경우에도 `source` 필드가 `demo`이면 예시로 표시합니다.
 
 실제 사내 데이터와 인증 토큰은 공개 GitHub 저장소나 Pages 파일에 올리지 마세요. 이 배포에는 예시 데이터만 포함되어 있습니다.
 

@@ -54,7 +54,7 @@ GitHub Pages는 정적 파일 호스팅입니다. GitLab 토큰이나 AWS 인증
 NEXT_PUBLIC_INFRA_STATUS_URL=http://127.0.0.1:4318/api/infra/status
 ```
 
-7. `http://localhost:3000/infradash-codex6/`에서 확인합니다. 로컬 API는 localhost/127.0.0.1:3000의 Origin만 허용합니다. HTTPS 공개 Pages에서 이 로컬 HTTP API로 연결하는 방식은 사용하지 않습니다.
+7. `http://localhost:3000/infradash-codex7/`에서 확인합니다. 로컬 API는 localhost/127.0.0.1:3000의 Origin만 허용합니다. HTTPS 공개 Pages에서 이 로컬 HTTP API로 연결하는 방식은 사용하지 않습니다.
 
 환경 파일에 없는 값을 수집기가 추측하지 않습니다. kube context의 서버 주소가 AWS가 반환한 EKS endpoint와 다르면 Kubernetes 조회를 중단합니다. GitLab 요청은 GET만 사용하며, API 토큰은 버전 API의 헤더에만 전달합니다. 외부 리다이렉트를 따라가며 토큰을 전달하지 않습니다. 원본 응답·오류·토큰·호스트명은 프런트엔드에 반환하지 않습니다.
 

@@ -10,78 +10,106 @@ import {
 
 const count = z.number().int().nonnegative().max(1_000_000_000);
 const text = z.string().min(1).max(160);
-export const dashboardSchema = z.object({
-  schemaVersion: z.literal(1),
-  source: z.enum(["live", "demo"]),
-  collectedAt: z.string().datetime({ offset: true }),
-  workspace: text,
-  license: z.object({ used: count, total: count }).nullable(),
-  health: z.enum(["healthy", "degraded", "down", "unknown"]),
-  daily: z
-    .array(
-      z.object({
-        date: z
-          .string()
-          .regex(/^\d{4}-\d{2}-\d{2}$/)
-          .refine(
-            (v) =>
-              !Number.isNaN(Date.parse(v)) &&
-              new Date(v).toISOString().slice(0, 10) === v,
-          ),
-        success: count,
-        failed: count,
-        canceled: count,
-      }),
-    )
-    .min(1)
-    .max(366)
-    .refine(
-      (rows) => rows.every((r, i) => !i || r.date > rows[i - 1].date),
-      "날짜는 중복 없이 오름차순이어야 합니다.",
-    ),
-  runners: z.object({
-    online: count,
-    offline: count,
-    paused: count,
-    capacity: count.nullable(),
-    busy: count.nullable(),
-  }),
-  queueSeconds: z.number().nonnegative().max(86400).nullable(),
-  pipelines: z
-    .array(
-      z.object({
-        id: count,
-        project: text,
-        ref: text,
-        status: z.enum(["success", "failed", "running", "pending", "canceled"]),
-        durationSeconds: z.number().nonnegative().nullable(),
-        startedAt: z.string().datetime({ offset: true }).nullable(),
-      }),
-    )
-    .max(1000),
-  services: z
-    .array(
-      z.object({
-        id: text,
-        name: text,
-        role: text,
-        state: z.enum(["healthy", "degraded", "down", "unknown"]),
-        detail: z.string().max(240),
-      }),
-    )
-    .max(20)
-    .refine((rows) => new Set(rows.map((r) => r.id)).size === rows.length),
-  alerts: z
-    .array(
-      z.object({
-        id: text,
-        title: text,
-        detail: z.string().max(240),
-        severity: z.enum(["critical", "warning", "info"]),
-      }),
-    )
-    .max(100),
-});
+export const dashboardSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    source: z.enum(["live", "demo"]),
+    collectedAt: z.string().datetime({ offset: true }),
+    workspace: text,
+    license: z.object({ used: count, total: count }).nullable(),
+    health: z.enum(["healthy", "degraded", "down", "unknown"]),
+    daily: z
+      .array(
+        z.object({
+          date: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .refine(
+              (v) =>
+                !Number.isNaN(Date.parse(v)) &&
+                new Date(v).toISOString().slice(0, 10) === v,
+            ),
+          success: count,
+          failed: count,
+          canceled: count,
+        }),
+      )
+      .min(1)
+      .max(366)
+      .refine(
+        (rows) => rows.every((r, i) => !i || r.date > rows[i - 1].date),
+        "날짜는 중복 없이 오름차순이어야 합니다.",
+      ),
+    runners: z.object({
+      online: count,
+      offline: count,
+      paused: count,
+      capacity: count.nullable(),
+      busy: count.nullable(),
+    }),
+    queueSeconds: z.number().nonnegative().max(86400).nullable(),
+    pipelines: z
+      .array(
+        z.object({
+          id: count,
+          project: text,
+          ref: text,
+          status: z.enum([
+            "success",
+            "failed",
+            "running",
+            "pending",
+            "canceled",
+          ]),
+          durationSeconds: z.number().nonnegative().nullable(),
+          startedAt: z.string().datetime({ offset: true }).nullable(),
+        }),
+      )
+      .max(1000),
+    services: z
+      .array(
+        z.object({
+          id: text,
+          name: text,
+          role: text,
+          state: z.enum(["healthy", "degraded", "down", "unknown"]),
+          detail: z.string().max(240),
+          cpu: z.number().min(0).max(100).optional(),
+          memory: z.number().min(0).max(100).optional(),
+          latencyMs: z.number().nonnegative().optional(),
+        }),
+      )
+      .max(20)
+      .refine((rows) => new Set(rows.map((r) => r.id)).size === rows.length),
+    alerts: z
+      .array(
+        z.object({
+          id: text,
+          title: text,
+          detail: z.string().max(240),
+          severity: z.enum(["critical", "warning", "info"]),
+        }),
+      )
+      .max(100)
+      .refine(
+        (rows) => new Set(rows.map((r) => r.id)).size === rows.length,
+        "신호 ID는 중복될 수 없습니다.",
+      ),
+    connections: z
+      .array(z.object({ from: text, to: text }))
+      .max(100)
+      .default([]),
+  })
+  .refine(
+    (data) =>
+      data.connections.every(
+        (edge) =>
+          edge.from !== edge.to &&
+          data.services.some((s) => s.id === edge.from) &&
+          data.services.some((s) => s.id === edge.to),
+      ),
+    "연결선의 양 끝은 수집된 구성 요소여야 합니다.",
+  );
 export type DashboardSnapshot = z.infer<typeof dashboardSchema>;
 export const demoDashboard: DashboardSnapshot = {
   schemaVersion: 1,
@@ -106,38 +134,116 @@ export const demoDashboard: DashboardSnapshot = {
   services: [
     {
       id: "edge",
-      name: "엣지",
-      role: "트래픽 진입",
+      name: "Cloudflare",
+      role: "Global edge",
       state: "healthy",
-      detail: "웹 방화벽과 캐시 · 응답 12밀리초",
+      detail: "웹 방화벽과 캐시를 거쳐 외부 요청이 들어오는 관문입니다.",
+      latencyMs: 14,
+    },
+    {
+      id: "ingress",
+      name: "Ingress",
+      role: "Traffic router",
+      state: "healthy",
+      detail: "웹·저장소·레지스트리 요청을 분산하는 진입 계층입니다.",
+      cpu: 18,
+      memory: 34,
+      latencyMs: 12,
     },
     {
       id: "gitlab",
-      name: "깃랩",
-      role: "애플리케이션",
+      name: "GitLab core",
+      role: "Web & API",
       state: "healthy",
-      detail: "웹 서비스 · 응답 42밀리초 · 메모리 68%",
+      detail:
+        "프로젝트, 코드 리뷰와 파이프라인 요청을 처리합니다. 웹 서비스 파드 8개.",
+      cpu: 46,
+      memory: 68,
+      latencyMs: 42,
+    },
+    {
+      id: "queue",
+      name: "Sidekiq",
+      role: "Background jobs",
+      state: "healthy",
+      detail: "알림과 저장소 동기화, 비동기 작업을 처리합니다. 워커 파드 12개.",
+      cpu: 58,
+      memory: 72,
     },
     {
       id: "storage",
-      name: "저장소",
-      role: "코드 보관",
+      name: "Gitaly",
+      role: "Repository storage",
       state: "degraded",
-      detail: "기탈리 볼륨 사용률 91% · 용량 확인 필요",
+      detail:
+        "샤드 02의 볼륨 사용률이 91%입니다. 대형 저장소와 보관 정책을 점검하세요.",
+      cpu: 78,
+      memory: 86,
+      latencyMs: 64,
     },
     {
       id: "database",
-      name: "데이터베이스",
-      role: "데이터 관리",
+      name: "PostgreSQL",
+      role: "Primary + replicas",
       state: "healthy",
-      detail: "복제본 3개 준비 · 응답 8밀리초",
+      detail: "메타데이터와 사용자 권한을 저장합니다. 주 노드 1대, 복제본 2대.",
+      cpu: 44,
+      memory: 76,
+      latencyMs: 1.4,
     },
     {
       id: "runner",
-      name: "러너",
-      role: "작업 실행",
+      name: "Runner fleet",
+      role: "Build & execution",
+      state: "degraded",
+      detail:
+        "등록 12대 중 온라인 7대입니다. 오프라인 러너와 대기열을 점검하세요.",
+      cpu: 82,
+      memory: 88,
+    },
+    {
+      id: "cache",
+      name: "Redis",
+      role: "Cache & sessions",
       state: "healthy",
-      detail: "온라인 7대 · 동시 실행 용량 58개",
+      detail: "세션과 작업 큐를 보관하는 캐시 계층입니다. 고가용성 노드 3개.",
+      cpu: 28,
+      memory: 52,
+      latencyMs: 0.6,
+    },
+  ],
+  connections: [
+    {
+      from: "edge",
+      to: "ingress",
+    },
+    {
+      from: "ingress",
+      to: "gitlab",
+    },
+    {
+      from: "ingress",
+      to: "queue",
+    },
+    {
+      from: "gitlab",
+      to: "storage",
+    },
+    {
+      from: "gitlab",
+      to: "database",
+    },
+    {
+      from: "gitlab",
+      to: "cache",
+    },
+    {
+      from: "queue",
+      to: "runner",
+    },
+    {
+      from: "queue",
+      to: "cache",
     },
   ],
   alerts: [

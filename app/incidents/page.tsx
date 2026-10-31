@@ -1,9 +1,6 @@
-import type { Metadata } from "next"
-
-import { IncidentsView } from "@/components/views/incidents-view"
-
-export const metadata: Metadata = { title: "인시던트" }
-
+import type { Metadata } from "next";
+import { SignalsView } from "@/components/relay/signals";
+export const metadata: Metadata = { title: "Signals" };
 export default function IncidentsPage() {
-  return <IncidentsView />
+  return <SignalsView />;
 }

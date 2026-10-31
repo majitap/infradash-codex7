@@ -149,7 +149,7 @@ export function LiveInfrastructureStatus() {
             <p>③ 네임스페이스·Webservice/Gitaly 워크로드 확인</p>
             <p>④ SSO 또는 VPN 뒤에 수집 API 배치</p>
             <a
-              href="https://github.com/majitap/infradash-codex6/blob/main/docs/LIVE-DATA-SETUP.md"
+              href="https://github.com/majitap/infradash-codex7/blob/main/docs/LIVE-DATA-SETUP.md"
               target="_blank"
               rel="noreferrer"
             >
