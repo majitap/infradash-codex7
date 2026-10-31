@@ -2,22 +2,22 @@ import type { DashboardSnapshot } from "./dashboard";
 export type RelayService = DashboardSnapshot["services"][number];
 export type RelayPipeline = DashboardSnapshot["pipelines"][number];
 export const stateName = {
-  healthy: "Operational",
-  degraded: "Degraded",
-  down: "Disrupted",
-  unknown: "Unverified",
+  healthy: "정상",
+  degraded: "주의",
+  down: "장애",
+  unknown: "미확인",
 };
 export const pipelineName = {
-  success: "Passed",
-  failed: "Failed",
-  running: "Running",
-  pending: "Queued",
-  canceled: "Canceled",
+  success: "성공",
+  failed: "실패",
+  running: "실행 중",
+  pending: "대기",
+  canceled: "취소",
 };
 export function formatDuration(value: number | null) {
   if (value === null) return "—";
   const s = Math.round(value);
-  return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
+  return s < 60 ? `${s}초` : `${Math.floor(s / 60)}분 ${s % 60}초`;
 }
 export function relativeTime(iso: string | null, reference: string) {
   if (!iso) return "미수집";

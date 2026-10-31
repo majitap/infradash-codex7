@@ -21,12 +21,16 @@ import {
   Sparkles,
   Terminal,
   TriangleAlert,
+  Server,
+  UserCheck,
+  KeyRound,
 } from "lucide-react";
 import { useDashboard } from "@/components/overview/dashboard-provider";
 import { DataConnect } from "@/components/overview/data-connect";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useRelay } from "./context";
 import { RelayMark } from "./primitives";
+import { useDisplayedLicense } from "./license-data";
 import {
   CommandDialog,
   CommandEmpty,
@@ -43,48 +47,68 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 const primaryNav = [
-  { href: "/", label: "Overview", caption: "운영 개요", icon: Compass },
+  { href: "/", label: "운영 개요", caption: "운영 개요", icon: Compass },
   {
     href: "/pipelines",
-    label: "Delivery",
+    label: "빌드·배포",
     caption: "배포의 흐름",
     icon: GitBranch,
   },
   {
     href: "/topology",
-    label: "Systems",
+    label: "시스템",
     caption: "연결된 시스템",
     icon: Network,
   },
   {
     href: "/incidents",
-    label: "Signals",
+    label: "운영 신호",
     caption: "확인이 필요한 신호",
     icon: Activity,
+  },
+  {
+    href: "/runners",
+    label: "러너",
+    caption: "러너 상태와 실행 자원",
+    icon: Server,
+  },
+];
+const management = [
+  {
+    href: "/access",
+    label: "인가 관리",
+    caption: "접근 요청 승인·반려와 역할 관리",
+    icon: UserCheck,
+  },
+  {
+    href: "/admin",
+    label: "운영 설정",
+    caption: "관리자 모드와 운영 설정",
+    icon: Settings2,
   },
 ];
 const explore = [
   {
     href: "/projects",
-    label: "Projects",
+    label: "프로젝트",
     caption: "프로젝트 분석 예시",
     icon: Box,
   },
   {
     href: "/finops",
-    label: "Cost intelligence",
+    label: "비용 분석",
     caption: "비용 분석 예시",
     icon: Sparkles,
   },
   {
     href: "/logs",
-    label: "Log explorer",
+    label: "로그 탐색",
     caption: "운영 로그",
     icon: Terminal,
   },
   {
     href: "/security",
-    label: "Security",
+    label: "보안",
     caption: "보안 분석 예시",
     icon: ShieldCheck,
   },
@@ -98,14 +122,14 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
       <div className="r7-workspace">
-        <span className="r7-workspace-monogram">m</span>
+        <span className="r7-workspace-monogram">마</span>
         <div>
-          <strong>{data?.workspace ?? "Workspace"}</strong>
-          <span>Infrastructure team</span>
+          <strong>{data?.workspace ?? "운영 공간"}</strong>
+          <span>인프라 운영팀</span>
         </div>
         <span className="r7-workspace-key">01</span>
       </div>
-      <div className="r7-nav-label">WORKSPACE</div>
+      <div className="r7-nav-label">운영</div>
       <nav aria-label="주 메뉴" className="r7-nav">
         {primaryNav.map((item) => (
           <Link
@@ -125,7 +149,7 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
           </Link>
         ))}
       </nav>
-      <div className="r7-nav-label r7-explore-label">EXPLORE</div>
+      <div className="r7-nav-label r7-explore-label">분석</div>
       <nav aria-label="추가 분석" className="r7-nav secondary">
         {explore.map((item) => (
           <Link
@@ -140,11 +164,27 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
           </Link>
         ))}
       </nav>
+      <div className="r7-nav-label r7-explore-label">관리자</div>
+      <nav aria-label="관리자 메뉴" className="r7-nav secondary">
+        {management.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            aria-current={path === item.href ? "page" : undefined}
+            title={item.caption}
+          >
+            <item.icon size={17} />
+            <span>{item.label}</span>
+            <ArrowUpRight size={12} />
+          </Link>
+        ))}
+      </nav>
       <div className="r7-sidebar-guide">
         <span className="r7-guide-orbit">
           <Layers size={20} />
         </span>
-        <strong>Your stack. Your signal.</strong>
+        <strong>우리 팀의 운영 공간</strong>
         <p>
           우리 팀의 데이터를 연결해
           <br />
@@ -158,7 +198,7 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
         className="r7-settings-link"
       >
         <Settings2 size={16} />
-        <span>Connections</span>
+        <span>연동 설정</span>
         <ChevronRight size={13} />
       </Link>
     </>
@@ -170,9 +210,10 @@ function SearchDialog() {
   const all = [
     ...primaryNav,
     ...explore,
+    ...management,
     {
       href: "/admin/integrations",
-      label: "Connections",
+      label: "연동 설정",
       caption: "데이터 연결 설정",
       icon: Settings2,
     },
@@ -181,14 +222,14 @@ function SearchDialog() {
     <CommandDialog
       open={searchOpen}
       onOpenChange={setSearchOpen}
-      title="Find your next move"
+      title="필요한 화면 찾기"
       description="페이지를 검색하고 이동합니다."
       className="r7-command"
     >
       <CommandInput placeholder="어디로 이동할까요?" />
       <CommandList>
         <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
-        <CommandGroup heading="Navigate">
+        <CommandGroup heading="화면 이동">
           {all.map((item) => (
             <CommandItem
               key={item.href}
@@ -209,7 +250,7 @@ function SearchDialog() {
       <div className="r7-command-footer">
         <span>↑↓ 이동</span>
         <span>↵ 열기</span>
-        <span>esc 닫기</span>
+        <span>취소 키로 닫기</span>
       </div>
     </CommandDialog>
   );
@@ -218,9 +259,15 @@ export function RelayShell({ children }: { children: React.ReactNode }) {
   const [mobile, setMobile] = useState(false),
     [focus, setFocus] = useState(false);
   const { data, error, stale, source, refresh, loading } = useDashboard();
+  const displayedLicense = useDisplayedLicense();
   const { setSearchOpen, acknowledged } = useRelay();
   const path = usePathname().replace(/\/$/, "") || "/";
-  const page = [...primaryNav, ...explore].find((n) => n.href === path);
+  const page = [
+    ...primaryNav,
+    ...explore,
+    ...management,
+    { href: "/admin/license", label: "라이선스" },
+  ].find((n) => n.href === path);
   const pending =
     data?.alerts.filter((a) => !acknowledged.includes(a.id)).length ?? 0;
   useEffect(() => {
@@ -234,33 +281,33 @@ export function RelayShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", listener);
   }, [setSearchOpen]);
   const sourceLabel = error
-    ? "Connection issue"
+    ? "연결 확인 필요"
     : !data
-      ? "Awaiting data"
+      ? "데이터 연결 대기"
       : stale
-        ? "Stale snapshot"
+        ? "오래된 수집 결과"
         : data.source === "demo"
-          ? "Demo workspace"
+          ? "예시 데이터"
           : source === "file"
-            ? "Imported snapshot"
-            : "Connected";
+            ? "가져온 데이터"
+            : "연결됨";
   const core = primaryNav.some((n) => n.href === path);
   return (
     <div className={`r7-shell ${focus ? "is-focused" : ""}`}>
       <aside className="r7-sidebar">
-        <Link href="/" className="r7-brand" aria-label="relay 홈">
+        <Link href="/" className="r7-brand" aria-label="릴레이 홈">
           <RelayMark size={31} />
           <span>
-            relay<span className="r7-brand-dot">.</span>
+            릴레이<span className="r7-brand-dot">.</span>
           </span>
           <span className="r7-edition">07</span>
         </Link>
         <Navigation onNavigate={() => {}} />
         <div className="r7-sidebar-bottom">
-          <span className="r7-person">M</span>
+          <span className="r7-person">마</span>
           <div>
-            <strong>Majitap</strong>
-            <span>Personal workspace</span>
+            <strong>마지탭</strong>
+            <span>개인 운영 공간</span>
           </div>
           <button
             aria-label="집중 모드"
@@ -290,18 +337,35 @@ export function RelayShell({ children }: { children: React.ReactNode }) {
                 <RelayMark size={24} />
               </button>
             )}
-            <span className="r7-breadcrumb-team">Workspace</span>
+            <span className="r7-breadcrumb-team">운영 공간</span>
             <span className="r7-slash">/</span>
-            <strong>{page?.label ?? "Connections"}</strong>
+            <strong>{page?.label ?? "연동 설정"}</strong>
           </div>
           <div className="r7-topbar-actions">
+            <Link
+              href="/admin/license"
+              className="r7-header-license"
+              aria-label={`라이선스 ${displayedLicense.counts ? `${displayedLicense.counts.used}/${displayedLicense.counts.total}` : "미수집"}${displayedLicense.source === "demo" ? ", 예시" : ""}`}
+              title={
+                displayedLicense.source === "demo"
+                  ? "예시 라이선스 사용량"
+                  : "수집된 라이선스 사용량"
+              }
+            >
+              <KeyRound size={13} />
+              <span>
+                {displayedLicense.counts
+                  ? `${displayedLicense.counts.used}/${displayedLicense.counts.total}`
+                  : "—/—"}
+              </span>
+            </Link>
             <button
               className="r7-search-button"
               aria-label="페이지 검색"
               onClick={() => setSearchOpen(true)}
             >
               <Search size={15} />
-              <span>Jump to…</span>
+              <span>화면 검색</span>
               <kbd>⌘ K</kbd>
             </button>
             <span
@@ -342,15 +406,21 @@ export function RelayShell({ children }: { children: React.ReactNode }) {
           )}
           {!core && (
             <div className="r7-explorer-heading">
-              <span>RELAY / EXPLORER</span>
-              <h1>{page?.label ?? "Connections"}</h1>
+              <span>
+                {path === "/access" || path.startsWith("/admin")
+                  ? "관리자 / 운영 관리"
+                  : "릴레이 / 상세 분석"}
+              </span>
+              <h1>{page?.label ?? "연동 설정"}</h1>
               <p>
-                {path.startsWith("/admin") || path === "/logs"
-                  ? "우리 팀의 운영 환경과 연결합니다."
-                  : "상세 분석을 살펴보는 예시 데이터 공간입니다."}
+                {path === "/access"
+                  ? "접근 요청부터 역할과 임시 권한까지, 한곳에서 검토합니다."
+                  : path.startsWith("/admin") || path === "/logs"
+                    ? "우리 팀의 운영 환경과 연결합니다."
+                    : "상세 분석을 살펴보는 예시 데이터 공간입니다."}
               </p>
               <Link href="/">
-                Overview로 돌아가기
+                운영 개요로 돌아가기
                 <ArrowUpRight size={14} />
               </Link>
             </div>
@@ -359,22 +429,22 @@ export function RelayShell({ children }: { children: React.ReactNode }) {
           <footer className="r7-footer">
             <span>
               <RelayMark size={14} />
-              Built for the people behind the uptime.
+              안정적인 운영을 만드는 사람들을 위해.
             </span>
             <a
               href="https://github.com/majitap/infradash-codex7"
               target="_blank"
               rel="noreferrer"
             >
-              Open source
+              소스 코드
               <ArrowUpRight size={12} />
             </a>
             <span>
               {data?.source === "demo"
-                ? "SAMPLE DATA · NO LIVE CHANGES"
+                ? "예시 데이터 · 실제 변경 없음"
                 : core
-                  ? "READ-ONLY OBSERVATION"
-                  : "OPERATIONS WORKSPACE"}
+                  ? "읽기 전용"
+                  : "운영 관리 공간"}
             </span>
           </footer>
         </main>
@@ -385,10 +455,10 @@ export function RelayShell({ children }: { children: React.ReactNode }) {
             <SheetTitle>
               <span className="r7-brand">
                 <RelayMark />
-                relay.
+                릴레이.
               </span>
             </SheetTitle>
-            <SheetDescription>Infrastructure workspace</SheetDescription>
+            <SheetDescription>인프라 운영 공간</SheetDescription>
           </SheetHeader>
           <Navigation onNavigate={() => setMobile(false)} />
         </SheetContent>

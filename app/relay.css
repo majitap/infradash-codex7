@@ -3463,7 +3463,7 @@ a {
     position: relative;
   }
   .r7-map-scroll::before {
-    content: "SWIPE TO EXPLORE →";
+    content: "옆으로 밀어 살펴보세요 →";
     position: sticky;
     left: 16px;
     display: block;
@@ -4021,10 +4021,10 @@ a {
 
 /* Readable type at working distances. */
 .r7-nav > a {
-  font-size: 13px;
+  font-size: 14px;
 }
 .r7-nav.secondary > a {
-  font-size: 12px;
+  font-size: 13px;
 }
 .r7-panel-header h2,
 .r7-delivery-heading h2,

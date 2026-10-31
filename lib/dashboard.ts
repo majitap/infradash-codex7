@@ -6,10 +6,32 @@ import {
   runnerCapacity,
   runnerBusy,
   avgQueueSeconds,
+  runners as sampleRunners,
 } from "./mock-data";
 
 const count = z.number().int().nonnegative().max(1_000_000_000);
 const text = z.string().min(1).max(160);
+export const runnerDetailSchema = z.object({
+  id: count,
+  name: text,
+  description: z.string().max(240).default(""),
+  status: z.enum(["online", "offline", "paused", "unknown"]),
+  executor: text.nullable().default(null),
+  version: text.nullable().default(null),
+  os: text.nullable().default(null),
+  arch: text.nullable().default(null),
+  ipAddress: text.nullable().default(null),
+  tags: z.array(text).max(100).default([]),
+  concurrent: count.nullable().default(null),
+  jobsRunning: count.nullable().default(null),
+  jobsLast24h: count.nullable().default(null),
+  jobsLast7d: z.array(count).max(7).default([]),
+  cpuLoad: z.number().min(0).max(100).nullable().default(null),
+  memUsed: z.number().min(0).max(100).nullable().default(null),
+  lastContact: z.string().datetime({ offset: true }).nullable().default(null),
+  note: z.string().max(240).default(""),
+});
+export type RunnerDetail = z.infer<typeof runnerDetailSchema>;
 export const dashboardSchema = z
   .object({
     schemaVersion: z.literal(1),
@@ -47,6 +69,14 @@ export const dashboardSchema = z
       capacity: count.nullable(),
       busy: count.nullable(),
     }),
+    runnerDetails: z
+      .array(runnerDetailSchema)
+      .max(1000)
+      .default([])
+      .refine(
+        (rows) => new Set(rows.map((r) => r.id)).size === rows.length,
+        "러너 ID는 중복될 수 없습니다.",
+      ),
     queueSeconds: z.number().nonnegative().max(86400).nullable(),
     pipelines: z
       .array(
@@ -116,10 +146,30 @@ export const demoDashboard: DashboardSnapshot = {
   source: "demo",
   collectedAt: "2026-10-31T01:12:00Z",
   workspace: "마지탭",
-  license: { used: 952, total: 1000 },
+  license: { used: 950, total: 1000 },
   health: "unknown",
   daily: dailyPipelines,
   runners: { ...runnerCounts, capacity: runnerCapacity, busy: runnerBusy },
+  runnerDetails: sampleRunners.map((r) => ({
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    status: r.status,
+    executor: r.executor,
+    version: r.version,
+    os: r.os,
+    arch: r.arch,
+    ipAddress: r.ipAddress,
+    tags: r.tags,
+    concurrent: r.concurrent,
+    jobsRunning: r.jobsRunning,
+    jobsLast24h: r.jobsLast24h,
+    jobsLast7d: r.jobsLast7d,
+    cpuLoad: r.cpuLoad,
+    memUsed: r.memUsed,
+    lastContact: `${r.lastContact}+09:00`,
+    note: r.note ?? "",
+  })),
   queueSeconds: avgQueueSeconds,
   pipelines: recentPipelines.map(
     ({ id, project, ref, status, durationSeconds, startedAt }) => ({
@@ -134,16 +184,16 @@ export const demoDashboard: DashboardSnapshot = {
   services: [
     {
       id: "edge",
-      name: "Cloudflare",
-      role: "Global edge",
+      name: "클라우드플레어",
+      role: "외부 진입점",
       state: "healthy",
       detail: "웹 방화벽과 캐시를 거쳐 외부 요청이 들어오는 관문입니다.",
       latencyMs: 14,
     },
     {
       id: "ingress",
-      name: "Ingress",
-      role: "Traffic router",
+      name: "인그레스",
+      role: "트래픽 분배",
       state: "healthy",
       detail: "웹·저장소·레지스트리 요청을 분산하는 진입 계층입니다.",
       cpu: 18,
@@ -152,8 +202,8 @@ export const demoDashboard: DashboardSnapshot = {
     },
     {
       id: "gitlab",
-      name: "GitLab core",
-      role: "Web & API",
+      name: "깃랩 코어",
+      role: "웹·응용 서비스",
       state: "healthy",
       detail:
         "프로젝트, 코드 리뷰와 파이프라인 요청을 처리합니다. 웹 서비스 파드 8개.",
@@ -163,8 +213,8 @@ export const demoDashboard: DashboardSnapshot = {
     },
     {
       id: "queue",
-      name: "Sidekiq",
-      role: "Background jobs",
+      name: "사이드킥",
+      role: "백그라운드 작업",
       state: "healthy",
       detail: "알림과 저장소 동기화, 비동기 작업을 처리합니다. 워커 파드 12개.",
       cpu: 58,
@@ -172,8 +222,8 @@ export const demoDashboard: DashboardSnapshot = {
     },
     {
       id: "storage",
-      name: "Gitaly",
-      role: "Repository storage",
+      name: "기탈리",
+      role: "저장소 서비스",
       state: "degraded",
       detail:
         "샤드 02의 볼륨 사용률이 91%입니다. 대형 저장소와 보관 정책을 점검하세요.",
@@ -183,8 +233,8 @@ export const demoDashboard: DashboardSnapshot = {
     },
     {
       id: "database",
-      name: "PostgreSQL",
-      role: "Primary + replicas",
+      name: "포스트그레스",
+      role: "주 노드·복제본",
       state: "healthy",
       detail: "메타데이터와 사용자 권한을 저장합니다. 주 노드 1대, 복제본 2대.",
       cpu: 44,
@@ -193,8 +243,8 @@ export const demoDashboard: DashboardSnapshot = {
     },
     {
       id: "runner",
-      name: "Runner fleet",
-      role: "Build & execution",
+      name: "러너 그룹",
+      role: "빌드·작업 실행",
       state: "degraded",
       detail:
         "등록 12대 중 온라인 7대입니다. 오프라인 러너와 대기열을 점검하세요.",
@@ -203,8 +253,8 @@ export const demoDashboard: DashboardSnapshot = {
     },
     {
       id: "cache",
-      name: "Redis",
-      role: "Cache & sessions",
+      name: "레디스",
+      role: "캐시·세션",
       state: "healthy",
       detail: "세션과 작업 큐를 보관하는 캐시 계층입니다. 고가용성 노드 3개.",
       cpu: 28,

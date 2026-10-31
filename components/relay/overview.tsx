@@ -17,6 +17,7 @@ import { SystemMap } from "./system-map";
 import { DeliveryChart } from "./delivery-chart";
 import { FocusQueue } from "./signals";
 import { PipelineInspector, SectionLabel, StatusIcon } from "./primitives";
+import { useDisplayedLicense } from "./license-data";
 export function OverviewView() {
   const { data, source } = useDashboard();
   const { acknowledged } = useRelay();
@@ -25,8 +26,8 @@ export function OverviewView() {
     return (
       <div className="r7-empty r7-empty-page">
         <Radio size={48} />
-        <SectionLabel>AWAITING YOUR SIGNAL</SectionLabel>
-        <h1>Connect the dots.</h1>
+        <SectionLabel>데이터 연결 대기</SectionLabel>
+        <h1>우리 팀의 흐름을 연결하세요.</h1>
         <p>수집 파일이나 인증된 수집 주소를 연결해 운영 공간을 시작하세요.</p>
         <DataConnect />
       </div>
@@ -35,13 +36,13 @@ export function OverviewView() {
     open = data.alerts.filter((a) => !acknowledged.includes(a.id)).length;
   const totalRunners =
     data.runners.online + data.runners.offline + data.runners.paused;
-  const date = new Intl.DateTimeFormat("en-US", {
+  const date = new Intl.DateTimeFormat("ko-KR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
     timeZone: "Asia/Seoul",
   }).format(new Date(data.collectedAt));
-  const time = new Intl.DateTimeFormat("en-GB", {
+  const time = new Intl.DateTimeFormat("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "Asia/Seoul",
@@ -52,12 +53,12 @@ export function OverviewView() {
         <div>
           <SectionLabel>
             <span className="r7-intro-tick" />
-            INFRASTRUCTURE, IN PERSPECTIVE
+            인프라의 흐름을 한눈에
           </SectionLabel>
           <h1>
-            A clear view.
+            한눈에 읽고,
             <br />
-            <span>A confident next move.</span>
+            <span>확신 있게 다음으로.</span>
           </h1>
           <p>복잡한 시스템 뒤에서, 다음 판단을 명확하게.</p>
         </div>
@@ -69,19 +70,19 @@ export function OverviewView() {
           </div>
           <span className="r7-snapshot-date">{date}</span>
           <span>
-            {time} KST <i />{" "}
+            {time} 한국 시간 <i />{" "}
             {data.source === "demo"
-              ? "DEMO SNAPSHOT"
+              ? "예시 수집 결과"
               : source === "file"
-                ? "IMPORTED SNAPSHOT"
-                : "LATEST COLLECTION"}
+                ? "가져온 수집 결과"
+                : "최근 수집 결과"}
           </span>
         </div>
       </div>
       <div className="r7-overview-metrics">
         <Link href="/pipelines">
           <span>
-            PIPELINE SUCCESS
+            파이프라인 성공률
             <ArrowUpRight size={13} />
           </span>
           <strong>
@@ -98,9 +99,9 @@ export function OverviewView() {
             >
               {summary.delta === null
                 ? "—"
-                : `${summary.delta > 0 ? "+" : ""}${summary.delta.toFixed(1)}pp`}
+                : `${summary.delta > 0 ? "+" : ""}${summary.delta.toFixed(1)}%p`}
             </span>
-            vs. previous 7 days
+            이전 7일 대비
           </p>
           <div className="r7-mini-ticks" aria-hidden="true">
             {summary.days.map((d) => (
@@ -116,16 +117,16 @@ export function OverviewView() {
         </Link>
         <Link href="/pipelines">
           <span>
-            COMPLETED RUNS
+            완료된 파이프라인
             <ArrowUpRight size={13} />
           </span>
           <strong>
             {summary.total.toLocaleString("en-US")}
-            <small>/ 7d</small>
+            <small>/ 7일</small>
           </strong>
           <p>
-            {summary.failed} failed <span className="r7-tiny-separator" />{" "}
-            {summary.success} passed
+            실패 {summary.failed} <span className="r7-tiny-separator" /> 성공{" "}
+            {summary.success}
           </p>
           <div className="r7-metric-bars" aria-hidden="true">
             {summary.days.map((d) => (
@@ -142,9 +143,9 @@ export function OverviewView() {
             ))}
           </div>
         </Link>
-        <Link href="/topology">
+        <Link href="/runners">
           <span>
-            RUNNERS ONLINE
+            온라인 러너
             <ArrowUpRight size={13} />
           </span>
           <strong>
@@ -154,25 +155,23 @@ export function OverviewView() {
           <p>
             <i className="r7-state-dot healthy" />
             {data.queueSeconds === null
-              ? "Queue time unavailable"
-              : `${data.queueSeconds}s average queue`}
+              ? "대기 시간 미수집"
+              : `${data.queueSeconds}초 평균 대기`}
           </p>
           <Server className="r7-metric-watermark" size={30} />
         </Link>
         <Link href="/incidents" className="r7-signal-metric">
           <span>
-            OPEN SIGNALS
+            확인할 신호
             <ArrowUpRight size={13} />
           </span>
           <strong>
             {String(open).padStart(2, "0")}
-            <small>to review</small>
+            <small>확인 필요</small>
           </strong>
           <p>
             <i className="r7-state-dot degraded" />
-            {open
-              ? "Your next move starts here"
-              : "All observed signals reviewed"}
+            {open ? "지금 확인할 일을 먼저" : "모든 신호 확인 완료"}
           </p>
           <Radio className="r7-metric-watermark" size={30} />
         </Link>
@@ -186,8 +185,8 @@ export function OverviewView() {
         <section className="r7-recent">
           <div className="r7-panel-header">
             <div>
-              <SectionLabel index="03">LATEST RUNS</SectionLabel>
-              <h2>From commit to change.</h2>
+              <SectionLabel index="03">최근 실행</SectionLabel>
+              <h2>코드에서 변화까지.</h2>
             </div>
             <Link
               href="/pipelines"
@@ -227,7 +226,7 @@ export function OverviewView() {
             )}
           </div>
           <Link href="/pipelines" className="r7-recent-footer">
-            Explore delivery
+            빌드·배포 자세히
             <ArrowRight size={14} />
           </Link>
         </section>
@@ -235,10 +234,10 @@ export function OverviewView() {
       <CapacityStrip />
       <div className="r7-bottom-message">
         <span>
-          <span className="r7-small-cross">✳</span>Great infrastructure feels
-          invisible.
+          <span className="r7-small-cross">✳</span>좋은 인프라는 조용하게
+          움직입니다.
           <br />
-          <strong>Great observability makes it clear.</strong>
+          <strong>좋은 관측은 그 흐름을 선명하게 만듭니다.</strong>
         </span>
         <DataConnect compact />
       </div>
@@ -251,8 +250,9 @@ export function OverviewView() {
 }
 function CapacityStrip() {
   const { data } = useDashboard();
+  const { counts: license } = useDisplayedLicense();
   if (!data) return null;
-  const { license, runners } = data;
+  const { runners } = data;
   const capacity = runners.capacity,
     busy = runners.busy,
     utilization =
@@ -264,19 +264,19 @@ function CapacityStrip() {
   return (
     <section className="r7-capacity-strip">
       <div className="r7-capacity-heading">
-        <SectionLabel index="04">HEADROOM</SectionLabel>
-        <h2>Room to keep moving.</h2>
+        <SectionLabel index="04">운영 여유</SectionLabel>
+        <h2>다음 실행을 위한 여유.</h2>
         <p>다음 실행을 위한 여유를 확인하세요.</p>
       </div>
       <div className="r7-slot-capacity">
         <div>
-          <span>RUNNER SLOTS</span>
+          <span>러너 동시 실행</span>
           <strong>
             {busy ?? "—"}
             <small>/ {capacity ?? "—"}</small>
           </strong>
           <span>
-            {utilization === null ? "Unobserved" : `${utilization}% in use`}
+            {utilization === null ? "미수집" : `${utilization}% 사용 중`}
           </span>
         </div>
         <div
@@ -315,14 +315,14 @@ function CapacityStrip() {
           <path d="m22 28 4 4 8-8" />
         </svg>
         <div>
-          <span>LICENSE HEADROOM</span>
+          <span>라이선스 여유</span>
           <strong>
             {license ? Math.max(0, license.total - license.used) : "—"}
-            <small>seats available</small>
+            <small>명 추가 가능</small>
           </strong>
           <p>
             {license
-              ? `${license.used.toLocaleString()} / ${license.total.toLocaleString()} seats assigned`
+              ? `${license.used.toLocaleString()} / ${license.total.toLocaleString()} 명 사용 중`
               : "라이선스 수량 미수집"}
           </p>
         </div>

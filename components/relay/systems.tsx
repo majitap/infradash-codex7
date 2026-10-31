@@ -23,13 +23,13 @@ export function SystemsView() {
   return (
     <div className="r7-page">
       <PageTitle
-        eyebrow="SYSTEMS / A CONNECTED PERSPECTIVE"
-        title="Understand the connections."
+        eyebrow="시스템 / 연결된 인프라"
+        title="연결을 이해하면, 흐름이 보입니다."
         description="구성 요소의 상태를 읽고, 선언된 연결을 따라가 보세요."
         actions={
           <span className="r7-readonly-badge">
             <Network size={14} />
-            Read-only observation
+            읽기 전용 조회
           </span>
         }
       />
@@ -39,36 +39,36 @@ export function SystemsView() {
             <Box size={20} />
           </span>
           <strong>{services.length}</strong>
-          <span>Services observed</span>
+          <span>수집된 구성 요소</span>
         </div>
         <div>
           <span className="r7-summary-symbol green">
             <Check size={20} />
           </span>
           <strong>{healthy}</strong>
-          <span>Operational</span>
+          <span>정상</span>
         </div>
         <div>
           <span className="r7-summary-symbol orange">
             <TriangleAlert size={20} />
           </span>
           <strong>{services.length - healthy}</strong>
-          <span>Needs verification</span>
+          <span>확인 필요</span>
         </div>
         <div>
           <span className="r7-summary-symbol">
             <Network size={20} />
           </span>
           <strong>{data?.connections.length ?? 0}</strong>
-          <span>Declared connections</span>
+          <span>등록된 연결</span>
         </div>
       </div>
       <SystemMap expanded />
       <section className="r7-service-inventory">
         <div className="r7-runs-heading">
           <div>
-            <SectionLabel>SERVICE INVENTORY</SectionLabel>
-            <h2>Every component has a story.</h2>
+            <SectionLabel>구성 요소 목록</SectionLabel>
+            <h2>작은 구성 요소까지 선명하게.</h2>
           </div>
           <label className="r7-input-search">
             <Search size={16} />
@@ -95,17 +95,17 @@ export function SystemsView() {
               <p>{s.detail}</p>
               <dl>
                 <div>
-                  <dt>CPU</dt>
+                  <dt>프로세서</dt>
                   <dd>{s.cpu === undefined ? "—" : `${s.cpu}%`}</dd>
                 </div>
                 <div>
-                  <dt>MEMORY</dt>
+                  <dt>메모리</dt>
                   <dd>{s.memory === undefined ? "—" : `${s.memory}%`}</dd>
                 </div>
                 <div>
-                  <dt>LATENCY</dt>
+                  <dt>응답 시간</dt>
                   <dd>
-                    {s.latencyMs === undefined ? "—" : `${s.latencyMs}ms`}
+                    {s.latencyMs === undefined ? "—" : `${s.latencyMs}밀리초`}
                   </dd>
                 </div>
               </dl>

@@ -22,8 +22,8 @@ export function DeliveryChart({ expanded = false }: { expanded?: boolean }) {
     <section className={`r7-delivery-chart ${expanded ? "expanded" : ""}`}>
       <div className="r7-panel-header">
         <div>
-          <SectionLabel index="02">DELIVERY PULSE</SectionLabel>
-          <h2>Small changes. Steady progress.</h2>
+          <SectionLabel index="02">배포 흐름</SectionLabel>
+          <h2>작은 변화가 이어지는 흐름.</h2>
         </div>
         <div className="r7-range" role="group" aria-label="실행 집계 기간">
           {([7, 30] as const).map((n) => (
@@ -35,7 +35,7 @@ export function DeliveryChart({ expanded = false }: { expanded?: boolean }) {
                 setSelected(null);
               }}
             >
-              {n}D
+              {n}일
             </button>
           ))}
         </div>
@@ -43,7 +43,7 @@ export function DeliveryChart({ expanded = false }: { expanded?: boolean }) {
       <div className="r7-chart-summary">
         <strong>
           {number.format(summary.total)}
-          <span>completed runs</span>
+          <span>완료된 실행</span>
         </strong>
         <span
           className={`r7-delta ${summary.delta !== null && summary.delta < 0 ? "negative" : ""}`}
@@ -56,22 +56,22 @@ export function DeliveryChart({ expanded = false }: { expanded?: boolean }) {
           <b>
             {summary.delta === null
               ? "—"
-              : `${summary.delta > 0 ? "+" : ""}${summary.delta.toFixed(1)}pp`}
+              : `${summary.delta > 0 ? "+" : ""}${summary.delta.toFixed(1)}%p`}
           </b>
-          success rate
+          성공률 변화
         </span>
         <div className="r7-chart-legend">
           <span>
             <i />
-            Passed
+            성공
           </span>
           <span>
             <i className="failed" />
-            Failed
+            실패
           </span>
           <span>
             <i className="canceled" />
-            Canceled
+            취소
           </span>
         </div>
       </div>
@@ -123,19 +123,19 @@ export function DeliveryChart({ expanded = false }: { expanded?: boolean }) {
       <div className="r7-chart-insight" aria-live="polite">
         <span className="r7-chart-date">
           {day.date}
-          <span>SELECTED DAY</span>
+          <span>선택한 날짜</span>
         </span>
         <div>
           <span>
             <i className="r7-state-dot healthy" />
-            Passed<strong>{number.format(day.success)}</strong>
+            성공<strong>{number.format(day.success)}</strong>
           </span>
           <span>
             <i className="r7-state-dot degraded" />
-            Failed<strong>{number.format(day.failed)}</strong>
+            실패<strong>{number.format(day.failed)}</strong>
           </span>
           <span className="r7-chart-canceled">
-            Canceled<strong>{number.format(day.canceled)}</strong>
+            취소<strong>{number.format(day.canceled)}</strong>
           </span>
         </div>
         {expanded && (
@@ -148,7 +148,7 @@ export function DeliveryChart({ expanded = false }: { expanded?: boolean }) {
               )
             }
           >
-            CSV
+            내역 받기
           </ExportButton>
         )}
       </div>

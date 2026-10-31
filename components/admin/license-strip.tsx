@@ -3,21 +3,31 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useOperations } from "./operations-provider";
 import { licenseRemaining, kstTime } from "@/lib/operations";
+import { useDisplayedLicense } from "@/components/relay/license-data";
 export function LicenseStrip({ detail = false }: { detail?: boolean }) {
   const { license, configured, loading, refresh } = useOperations();
+  const displayed = useDisplayedLicense();
   const available = license?.state === "available";
-  const remaining = available ? licenseRemaining(license) : null;
+  const remaining = available
+    ? licenseRemaining(license)
+    : displayed.counts
+      ? Math.max(0, displayed.counts.total - displayed.counts.used)
+      : null;
   const count = (n: number | null | undefined) =>
     n == null ? "—" : n.toLocaleString("ko-KR");
   const state = loading
     ? "조회 중"
     : available
       ? "실제 데이터"
-      : !configured || license?.state === "unconfigured"
-        ? "미연동"
-        : license?.state === "forbidden"
-          ? "권한 확인 필요"
-          : "조회 불가";
+      : !configured && displayed.counts
+        ? displayed.source === "demo"
+          ? "예시 데이터"
+          : "수집된 데이터"
+        : !configured || license?.state === "unconfigured"
+          ? "미연동"
+          : license?.state === "forbidden"
+            ? "권한 확인 필요"
+            : "조회 불가";
   return (
     <section
       className="ops-panel license-panel"
@@ -51,14 +61,14 @@ export function LicenseStrip({ detail = false }: { detail?: boolean }) {
         <div>
           <dt>보유 라이선스</dt>
           <dd>
-            {count(available ? license.userLimit : null)}
+            {count(displayed.counts?.total)}
             <span>석</span>
           </dd>
         </div>
         <div>
           <dt>사용 중</dt>
           <dd>
-            {count(available ? license.activeUsers : null)}
+            {count(displayed.counts?.used)}
             <span>명</span>
           </dd>
         </div>
@@ -84,7 +94,11 @@ export function LicenseStrip({ detail = false }: { detail?: boolean }) {
       <p className="ops-footnote">
         {available
           ? `최근 조회 ${kstTime(license.collectedAt)} · 현재 활성 사용자 기준${license.activeUsers !== null && license.userLimit !== null && license.activeUsers > license.userLimit ? ` · ${license.activeUsers - license.userLimit}석 초과` : ""}`
-          : "라이선스 API 연결 후 실제 보유 수량과 사용량을 표시합니다."}
+          : displayed.counts
+            ? displayed.source === "demo"
+              ? "예시 라이선스 수량입니다. 실제 데이터를 연결하면 수집된 수량을 표시합니다."
+              : "수집 결과의 라이선스 수량입니다. 만료일은 별도 라이선스 연동에서 조회합니다."
+            : "라이선스 수집 주소 연결 후 실제 보유 수량과 사용량을 표시합니다."}
       </p>
     </section>
   );

@@ -20,7 +20,7 @@ test("실행 소요 시간은 성공한 실행의 실제 중앙값이며 미수�
   ];
   assert.equal(deliveryStats(pipelines).median, 105);
   assert.equal(deliveryStats(pipelines.slice(4)).median, null);
-  assert.equal(formatDuration(59.8), "1m 0s");
+  assert.equal(formatDuration(59.8), "1분 0초");
   assert.equal(formatDuration(null), "—");
 });
 
@@ -80,4 +80,11 @@ test("신호의 입력 순서와 무관하게 심각한 항목을 우선하며 �
   assert.equal(prioritizeSignals(alerts)[0].severity, "critical");
   assert.deepEqual(alerts, before);
   assert.equal(dashboardSchema.safeParse({ ...demoDashboard, alerts: [alerts[0], alerts[0]] }).success, false);
+});
+
+test("기존 수집 파일은 러너 목록 없이 호환되며 잘못된 러너 지표와 중복 ID는 거부한다", () => {
+  assert.deepEqual(dashboardSchema.parse({...demoDashboard,runnerDetails:undefined}).runnerDetails,[]);
+  const runner = demoDashboard.runnerDetails[0];
+  assert.equal(dashboardSchema.safeParse({...demoDashboard,runnerDetails:[runner,runner]}).success,false);
+  assert.equal(dashboardSchema.safeParse({...demoDashboard,runnerDetails:[{...runner,cpuLoad:101}]}).success,false);
 });

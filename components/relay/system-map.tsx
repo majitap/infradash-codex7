@@ -54,9 +54,9 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
     >
       <div className="r7-panel-header">
         <div>
-          <SectionLabel index="01">SYSTEM LANDSCAPE</SectionLabel>
+          <SectionLabel index="01">시스템 구성</SectionLabel>
           <h2 id="runtime-map-title">
-            The shape of your stack<span className="r7-heading-dot">.</span>
+            연결로 읽는 시스템<span className="r7-heading-dot">.</span>
           </h2>
         </div>
         <div
@@ -84,12 +84,10 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
         <div className="r7-map-scope">
           <span className="r7-live-dot" />
           <span>
-            {data?.source === "demo"
-              ? "Reference architecture"
-              : "Observed services"}
+            {data?.source === "demo" ? "예시 구성도" : "수집된 구성 요소"}
           </span>
           <span className="r7-toolbar-separator" />
-          <span>{services.length} services</span>
+          <span>{services.length} 개 구성 요소</span>
         </div>
         <button
           className={`r7-map-filter ${attention ? "selected" : ""}`}
@@ -97,7 +95,7 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
           aria-pressed={attention}
         >
           <CircleIndicator state="degraded" />
-          {attention ? "Show all" : "Focus on attention"}
+          {attention ? "전체 보기" : "주의 항목만"}
         </button>
       </div>
       {services.length ? (
@@ -111,9 +109,9 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
                 <div className="r7-graph-ambient" />
                 {data?.source === "demo" && (
                   <div className="r7-map-coordinates">
-                    <span>↗ EXTERNAL</span>
-                    <span>RUNTIME / COMPUTE</span>
-                    <span>DATA / EXECUTION</span>
+                    <span>↗ 외부 연결</span>
+                    <span>서비스 / 실행</span>
+                    <span>데이터 / 작업</span>
                   </div>
                 )}
                 <svg
@@ -184,7 +182,7 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
                 )}
                 <span className="r7-graph-note">
                   {connections.length
-                    ? "DECLARED CONNECTIONS"
+                    ? "등록된 연결 관계"
                     : "연결 관계 미수집 · 구성 요소만 표시"}
                 </span>
                 <button
@@ -194,7 +192,7 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
                   }
                   onClick={() => setMotion(!motion)}
                 >
-                  {motion ? <Pause size={12} /> : <Play size={12} />}Flow
+                  {motion ? <Pause size={12} /> : <Play size={12} />}흐름
                 </button>
               </div>
             </div>
@@ -221,21 +219,21 @@ export function SystemMap({ expanded = false }: { expanded?: boolean }) {
       ) : (
         <div className="r7-empty">
           <Network size={36} />
-          <h3>No services observed.</h3>
+          <h3>수집된 구성 요소가 없습니다.</h3>
           <p>수집 파일에 구성 요소를 추가하면 시스템 맵이 나타납니다.</p>
         </div>
       )}
       <div className="r7-map-footer">
         <span>
           <CircleIndicator state="healthy" />
-          {healthy} operational
+          {healthy} 정상
           <span className="r7-footer-divider" />
           <CircleIndicator state="degraded" />
-          {services.length - healthy} to review
+          {services.length - healthy} 확인 필요
         </span>
         {!expanded && (
           <Link href="/topology">
-            Explore systems
+            시스템 자세히
             <ArrowUpRight size={14} />
           </Link>
         )}
@@ -268,15 +266,17 @@ function ServiceDetail({
       </div>
       <div className="r7-service-numbers">
         {[
-          { label: "CPU", value: service.cpu, unit: "%" },
-          { label: "MEMORY", value: service.memory, unit: "%" },
-          { label: "LATENCY", value: service.latencyMs, unit: "ms" },
+          { label: "프로세서", value: service.cpu, unit: "%" },
+          { label: "메모리", value: service.memory, unit: "%" },
+          { label: "응답 시간", value: service.latencyMs, unit: "ms" },
         ].map((m) => (
           <div key={m.label}>
             <span>{m.label}</span>
             <strong>
               {m.value ?? "—"}
-              {m.value !== undefined && <small>{m.unit}</small>}
+              {m.value !== undefined && (
+                <small>{m.unit === "ms" ? "밀리초" : m.unit}</small>
+              )}
             </strong>
             {m.unit === "%" && (
               <i>

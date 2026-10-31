@@ -39,8 +39,8 @@ export function DeliveryView() {
   return (
     <div className="r7-page">
       <PageTitle
-        eyebrow="DELIVERY / ENGINEERING MOMENTUM"
-        title="Keep good changes moving."
+        eyebrow="빌드·배포 / 실행의 흐름"
+        title="좋은 변화가 멈추지 않도록."
         description="완료된 실행의 추이부터 지금 진행 중인 파이프라인까지."
         actions={
           <button
@@ -62,13 +62,13 @@ export function DeliveryView() {
             }
           >
             <ArrowDownToLine size={14} />
-            Export runs
+            실행 내역 저장
           </button>
         }
       />
       <div className="r7-delivery-kpis">
         <div>
-          <SectionLabel>RUNNING NOW</SectionLabel>
+          <SectionLabel>실행 중</SectionLabel>
           <strong>
             {stats.running}
             <span className="r7-pulse-small" />
@@ -76,23 +76,23 @@ export function DeliveryView() {
           <p>수집 시점 기준</p>
         </div>
         <div>
-          <SectionLabel>MEDIAN DURATION</SectionLabel>
+          <SectionLabel>소요 시간 중앙값</SectionLabel>
           <strong>{formatDuration(stats.median)}</strong>
           <p>수집된 성공 실행 기준</p>
         </div>
         <div>
-          <SectionLabel>PROJECTS OBSERVED</SectionLabel>
+          <SectionLabel>수집된 프로젝트</SectionLabel>
           <strong>
             {stats.projects}
-            <small>projects</small>
+            <small>개</small>
           </strong>
           <p>실행 목록의 고유 프로젝트</p>
         </div>
         <div>
-          <SectionLabel>FAILED RUNS</SectionLabel>
+          <SectionLabel>실패한 실행</SectionLabel>
           <strong className="r7-orange">
             {stats.failed}
-            <small>runs</small>
+            <small>건</small>
           </strong>
           <p>수집된 실행 목록 기준</p>
         </div>
@@ -101,7 +101,7 @@ export function DeliveryView() {
       <section className="r7-runs-panel">
         <div className="r7-runs-heading">
           <h2>
-            Pipeline explorer<span>{pipelines.length}</span>
+            파이프라인 탐색<span>{pipelines.length}</span>
           </h2>
           <label className="r7-input-search">
             <Search size={16} />
@@ -137,7 +137,7 @@ export function DeliveryView() {
                 }}
               >
                 {f === "all"
-                  ? "All runs"
+                  ? "전체"
                   : pipelineName[f as RelayPipeline["status"]]}
                 <span>
                   {f === "all"
@@ -150,10 +150,10 @@ export function DeliveryView() {
         </div>
         <div className="r7-runs-table">
           <div className="r7-runs-table-header">
-            <span>PIPELINE / PROJECT</span>
-            <span>STATUS</span>
-            <span>BRANCH</span>
-            <span>DURATION</span>
+            <span>파이프라인 / 프로젝트</span>
+            <span>상태</span>
+            <span>브랜치</span>
+            <span>소요 시간</span>
           </div>
           {rows.map((p) => (
             <button
@@ -185,7 +185,7 @@ export function DeliveryView() {
           {!rows.length && (
             <div className="r7-empty">
               <Search size={30} />
-              <h3>No matching runs.</h3>
+              <h3>조건에 맞는 실행이 없습니다.</h3>
               <p>검색어나 상태 필터를 바꿔보세요.</p>
             </div>
           )}
@@ -193,15 +193,15 @@ export function DeliveryView() {
         <div className="r7-pagination">
           <span>
             {filtered.length ? activePage * size + 1 : 0}–
-            {Math.min((activePage + 1) * size, filtered.length)} of{" "}
-            {filtered.length} runs
+            {Math.min((activePage + 1) * size, filtered.length)} /{" "}
+            {filtered.length} 건
           </span>
           <div>
             <button
               onClick={() => setPage(activePage - 1)}
               disabled={activePage === 0}
             >
-              Previous
+              이전
             </button>
             <span>
               {activePage + 1} / {pageCount}
@@ -210,7 +210,7 @@ export function DeliveryView() {
               onClick={() => setPage(activePage + 1)}
               disabled={activePage >= pageCount - 1}
             >
-              Next
+              다음
             </button>
           </div>
         </div>

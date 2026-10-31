@@ -99,7 +99,7 @@ export function PipelineInspector({
           </span>
           <DialogTitle>{pipeline?.project}</DialogTitle>
           <DialogDescription>
-            Pipeline #{pipeline?.id} · 수집된 실행 기록
+            파이프라인 #{pipeline?.id} · 수집된 실행 기록
           </DialogDescription>
         </DialogHeader>
         {pipeline && (
@@ -111,11 +111,11 @@ export function PipelineInspector({
             </div>
             <dl className="r7-detail-grid">
               <div>
-                <dt>Branch</dt>
+                <dt>브랜치</dt>
                 <dd>{pipeline.ref}</dd>
               </div>
               <div>
-                <dt>Started · KST</dt>
+                <dt>시작 시각 · 한국 시간</dt>
                 <dd>
                   {pipeline.startedAt
                     ? new Intl.DateTimeFormat("ko-KR", {
@@ -156,7 +156,7 @@ export function downloadText(
 }
 export function ExportButton({
   onClick,
-  children = "Export report",
+  children = "보고서 저장",
 }: {
   onClick: () => void;
   children?: React.ReactNode;

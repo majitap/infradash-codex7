@@ -11,9 +11,9 @@ export const ROLE_ORDER: UserRole[] = ["Guest", "Reporter", "Developer", "Mainta
 export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   Guest: "이슈 보기와 작성만 가능",
   Reporter: "코드 읽기, 이슈·라벨 관리",
-  Developer: "브랜치 푸시, MR 생성, 파이프라인 실행",
-  Maintainer: "보호 브랜치 머지, CI/CD·멤버 관리",
-  Owner: "그룹 설정, 삭제, Owner 지정",
+  Developer: "브랜치 푸시, 병합 요청 생성, 파이프라인 실행",
+  Maintainer: "보호 브랜치 머지, 빌드·배포·멤버 관리",
+  Owner: "그룹 설정, 삭제, 소유자 지정",
 }
 
 export function roleRank(role: UserRole | null) {
@@ -175,7 +175,7 @@ function buildRequests(): AccessRequest[] {
       group: null,
       currentRole: null,
       requestedRole: "Admin",
-      reason: "11월 15일 GitLab 업그레이드 작업 기간 동안 인스턴스 관리자 권한이 필요합니다.",
+      reason: "11월 15일 깃랩 업그레이드 작업 기간 동안 인스턴스 관리자 권한이 필요합니다.",
       requestedAt: at(5),
       durationDays: 14,
       highPrivilege: true,
@@ -214,7 +214,7 @@ function buildRequests(): AccessRequest[] {
       group: tempGroup,
       currentRole: membershipOf(anyDev.id, tempGroup)?.role ?? null,
       requestedRole: "Developer",
-      reason: "INC-240 Gitaly 볼륨 대응을 위해 인프라 저장소 수정이 필요합니다.",
+      reason: "INC-240 기탈리 볼륨 대응을 위해 인프라 저장소 수정이 필요합니다.",
       requestedAt: at(20),
       durationDays: 7,
       highPrivilege: false,
@@ -240,7 +240,7 @@ function buildRequests(): AccessRequest[] {
       group: "frontend",
       currentRole: null,
       requestedRole: "Reporter",
-      reason: "외부 디자인 협력사 QA 담당. 계약 기간 동안 읽기 권한 요청",
+      reason: "외부 디자인 협력사 품질 검증 담당. 계약 기간 동안 읽기 권한 요청",
       requestedAt: at(41),
       durationDays: 30,
       highPrivilege: false,
@@ -277,12 +277,12 @@ export type HandledRequest = {
 }
 
 export const handledRequests: HandledRequest[] = [
-  { id: "AR-310", user: committers[5], summary: "infra 그룹 · Developer (임시 7일)", decision: "approved", decidedBy: admins0[0] ?? committers[0], decidedAt: addMinutes(MOCK_NOW, -60 * 30) },
-  { id: "AR-309", user: committers[9], summary: "관리자 권한", decision: "denied", decidedBy: admins0[1] ?? committers[1], decidedAt: addMinutes(MOCK_NOW, -60 * 47), note: "업무상 필요성 불충분. 그룹 Owner로 대체 가능" },
-  { id: "AR-308", user: committers[14], summary: "mobile 그룹 · Reporter → Developer", decision: "approved", decidedBy: admins0[0] ?? committers[0], decidedAt: addMinutes(MOCK_NOW, -60 * 70) },
-  { id: "AR-307", user: committers[19], summary: "data 그룹 · Owner", decision: "denied", decidedBy: admins0[2] ?? committers[2], decidedAt: addMinutes(MOCK_NOW, -60 * 96), note: "2인 승인 정책에 따라 두 번째 승인자 거절" },
-  { id: "AR-306", user: committers[22], summary: "platform 그룹 · Developer", decision: "approved", decidedBy: admins0[1] ?? committers[1], decidedAt: addMinutes(MOCK_NOW, -60 * 120) },
-  { id: "AR-305", user: committers[26], summary: "backend 그룹 · Developer → Maintainer", decision: "approved", decidedBy: admins0[2] ?? committers[2], decidedAt: addMinutes(MOCK_NOW, -60 * 150) },
+  { id: "AR-310", user: committers[5], summary: "infra 그룹 · 개발자 (임시 7일)", decision: "approved", decidedBy: admins0[0] ?? committers[0], decidedAt: addMinutes(MOCK_NOW, -60 * 30) },
+  { id: "AR-309", user: committers[9], summary: "관리자 권한", decision: "denied", decidedBy: admins0[1] ?? committers[1], decidedAt: addMinutes(MOCK_NOW, -60 * 47), note: "업무상 필요성 불충분. 그룹 소유자로 대체 가능" },
+  { id: "AR-308", user: committers[14], summary: "mobile 그룹 · 조회자 → 개발자", decision: "approved", decidedBy: admins0[0] ?? committers[0], decidedAt: addMinutes(MOCK_NOW, -60 * 70) },
+  { id: "AR-307", user: committers[19], summary: "data 그룹 · 소유자", decision: "denied", decidedBy: admins0[2] ?? committers[2], decidedAt: addMinutes(MOCK_NOW, -60 * 96), note: "2인 승인 정책에 따라 두 번째 승인자 거절" },
+  { id: "AR-306", user: committers[22], summary: "platform 그룹 · 개발자", decision: "approved", decidedBy: admins0[1] ?? committers[1], decidedAt: addMinutes(MOCK_NOW, -60 * 120) },
+  { id: "AR-305", user: committers[26], summary: "backend 그룹 · 개발자 → 유지관리자", decision: "approved", decidedBy: admins0[2] ?? committers[2], decidedAt: addMinutes(MOCK_NOW, -60 * 150) },
 ]
 
 // ---------------------------------------------------------------------------
@@ -309,13 +309,13 @@ export const PERMISSIONS: Permission[] = [
   { key: "push", label: "일반 브랜치 푸시", category: "코드", minRole: "Developer" },
   { key: "mr", label: "머지 리퀘스트 생성", category: "코드", minRole: "Developer" },
   { key: "protected", label: "보호 브랜치 푸시·머지", category: "코드", minRole: "Maintainer" },
-  { key: "pipeline", label: "파이프라인 실행·재시도", category: "CI/CD", minRole: "Developer" },
-  { key: "variables", label: "CI/CD 변수 관리", category: "CI/CD", minRole: "Maintainer" },
-  { key: "runners", label: "프로젝트 러너 관리", category: "CI/CD", minRole: "Maintainer" },
-  { key: "deploy", label: "보호된 환경 배포", category: "CI/CD", minRole: "Maintainer" },
-  { key: "members", label: "멤버 추가 (Maintainer 이하)", category: "관리", minRole: "Maintainer" },
+  { key: "pipeline", label: "파이프라인 실행·재시도", category: "빌드·배포", minRole: "Developer" },
+  { key: "variables", label: "빌드·배포 변수 관리", category: "빌드·배포", minRole: "Maintainer" },
+  { key: "runners", label: "프로젝트 러너 관리", category: "빌드·배포", minRole: "Maintainer" },
+  { key: "deploy", label: "보호된 환경 배포", category: "빌드·배포", minRole: "Maintainer" },
+  { key: "members", label: "멤버 추가 (유지관리자 이하)", category: "관리", minRole: "Maintainer" },
   { key: "settings", label: "프로젝트 설정 변경", category: "관리", minRole: "Maintainer" },
-  { key: "owners", label: "Owner 지정·그룹 설정", category: "관리", minRole: "Owner" },
+  { key: "owners", label: "소유자 지정·그룹 설정", category: "관리", minRole: "Owner" },
   { key: "delete", label: "프로젝트 삭제·이전", category: "관리", minRole: "Owner" },
 ]
 
@@ -330,11 +330,11 @@ export function hasPermission(role: UserRole, p: Permission) {
 export type AccessPolicy = { id: string; label: string; description: string; enabled: boolean }
 
 export const accessPolicies: AccessPolicy[] = [
-  { id: "two-approvers", label: "Owner·관리자 권한은 2인 승인", description: "높은 권한 요청은 서로 다른 관리자 두 명이 승인해야 반영됩니다.", enabled: true },
-  { id: "signup-approval", label: "신규 가입 시 관리자 승인", description: "SSO로 처음 로그인한 계정은 승인 전까지 접근할 수 없습니다.", enabled: true },
-  { id: "admin-2fa", label: "관리자 2FA 필수", description: "2FA가 없는 관리자는 관리자 영역에 들어갈 수 없습니다.", enabled: true },
+  { id: "two-approvers", label: "소유자·관리자 권한은 2인 승인", description: "높은 권한 요청은 서로 다른 관리자 두 명이 승인해야 반영됩니다.", enabled: true },
+  { id: "signup-approval", label: "신규 가입 시 관리자 승인", description: "통합 로그인으로 처음 접속한 계정은 승인 전까지 접근할 수 없습니다.", enabled: true },
+  { id: "admin-2fa", label: "관리자 2단계 인증 필수", description: "2단계 인증을 사용하지 않는 관리자는 관리자 영역에 들어갈 수 없습니다.", enabled: true },
   { id: "temp-max", label: "임시 권한 최대 30일", description: "만료일이 없는 임시 요청은 30일로 제한합니다.", enabled: true },
-  { id: "external-guest", label: "외부 협력사 계정은 Reporter 이하", description: "@example.com 이외 도메인 계정은 Developer 이상을 받을 수 없습니다.", enabled: true },
+  { id: "external-guest", label: "외부 협력사 계정은 조회자 이하", description: "@example.com 이외 도메인 계정은 개발자 이상을 받을 수 없습니다.", enabled: true },
   { id: "dormant", label: "90일 미접속 계정 자동 비활성화", description: "장기 미접속 계정의 모든 멤버십을 회수합니다.", enabled: false },
   { id: "group-create", label: "최상위 그룹 생성은 관리자만", description: "일반 사용자는 하위 그룹만 만들 수 있습니다.", enabled: true },
 ]
@@ -358,7 +358,7 @@ export const privilegeReviews: PrivilegeReview[] = memberships
     if (user.status === "blocked") reason = "차단된 계정이 높은 권한을 보유"
     else if (idle >= 14) reason = `${idle}일째 활동 없음`
     else if (user.mrsMerged30d === 0 && user.reviews30d < 3) reason = "30일간 머지·리뷰 기록 거의 없음"
-    else if (!user.twoFactor) reason = "2FA 미사용"
+    else if (!user.twoFactor) reason = "2단계 인증 미사용"
     return { membership: m, user, reason }
   })
   .filter((r) => r.reason !== "")
@@ -378,13 +378,13 @@ export type PermissionChange = {
 }
 
 export const permissionHistory: PermissionChange[] = [
-  { id: 9, at: addMinutes(MOCK_NOW, -60 * 30), actor: admins0[0] ?? committers[0], subject: committers[5], action: "임시 권한 부여", detail: "infra · Developer · 11월 6일 만료" },
-  { id: 8, at: addMinutes(MOCK_NOW, -60 * 52), actor: admins0[1] ?? committers[1], subject: committers[11], action: "멤버십 회수", detail: "payment-service · Maintainer → 없음 (퇴사)" },
-  { id: 7, at: addMinutes(MOCK_NOW, -60 * 70), actor: admins0[0] ?? committers[0], subject: committers[14], action: "권한 상향", detail: "mobile · Reporter → Developer" },
+  { id: 9, at: addMinutes(MOCK_NOW, -60 * 30), actor: admins0[0] ?? committers[0], subject: committers[5], action: "임시 권한 부여", detail: "infra · 개발자 · 11월 6일 만료" },
+  { id: 8, at: addMinutes(MOCK_NOW, -60 * 52), actor: admins0[1] ?? committers[1], subject: committers[11], action: "멤버십 회수", detail: "payment-service · 유지관리자 → 없음 (퇴사)" },
+  { id: 7, at: addMinutes(MOCK_NOW, -60 * 70), actor: admins0[0] ?? committers[0], subject: committers[14], action: "권한 상향", detail: "mobile · 조회자 → 개발자" },
   { id: 6, at: addMinutes(MOCK_NOW, -60 * 98), actor: admins0[2] ?? committers[2], subject: committers[17], action: "관리자 해제", detail: "인스턴스 관리자 → 일반 사용자" },
-  { id: 5, at: addMinutes(MOCK_NOW, -60 * 120), actor: admins0[1] ?? committers[1], subject: committers[22], action: "그룹 추가", detail: "platform · Developer" },
-  { id: 4, at: addMinutes(MOCK_NOW, -60 * 150), actor: admins0[2] ?? committers[2], subject: committers[26], action: "권한 상향", detail: "backend · Developer → Maintainer" },
-  { id: 3, at: addMinutes(MOCK_NOW, -60 * 190), actor: admins0[0] ?? committers[0], subject: committers[29], action: "만료일 연장", detail: "data · Reporter · 12월 1일까지" },
+  { id: 5, at: addMinutes(MOCK_NOW, -60 * 120), actor: admins0[1] ?? committers[1], subject: committers[22], action: "그룹 추가", detail: "platform · 개발자" },
+  { id: 4, at: addMinutes(MOCK_NOW, -60 * 150), actor: admins0[2] ?? committers[2], subject: committers[26], action: "권한 상향", detail: "backend · 개발자 → 유지관리자" },
+  { id: 3, at: addMinutes(MOCK_NOW, -60 * 190), actor: admins0[0] ?? committers[0], subject: committers[29], action: "만료일 연장", detail: "data · 조회자 · 12월 1일까지" },
 ]
 
 export const pendingRequestCount = accessRequests.length

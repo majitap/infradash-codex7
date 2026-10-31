@@ -7,6 +7,7 @@ import "./atelier.css";
 import "./operations.css";
 import "./clarity.css";
 import "./relay.css";
+import "./relay-ko.css";
 import { DashboardProvider } from "@/components/overview/dashboard-provider";
 import { OperationsProvider } from "@/components/admin/operations-provider";
 import { ThemeProvider } from "@/components/layout/theme-provider";
@@ -16,8 +17,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 export const metadata: Metadata = {
   title: {
-    default: "relay — Infrastructure, in perspective.",
-    template: "%s · relay",
+    default: "릴레이 · 인프라의 흐름을 한눈에",
+    template: "%s · 릴레이",
   },
   description:
     "복잡한 인프라에서 다음 행동을 발견하세요. 배포 흐름, 시스템 맵, 운영 신호가 하나로 이어지는 인프라 워크스페이스.",
@@ -28,7 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" suppressHydrationWarning className="h-full">
+    <html
+      lang="ko"
+      suppressHydrationWarning
+      className="h-full"
+      data-scroll-behavior="smooth"
+    >
       <body className="min-h-full antialiased">
         <a className="skip-to-content" href="#main-content">
           본문으로 건너뛰기

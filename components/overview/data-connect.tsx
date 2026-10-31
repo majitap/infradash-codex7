@@ -55,7 +55,7 @@ export function DataConnect({ compact = false }: { compact?: boolean }) {
             </span>
             <DialogTitle>내 데이터로 시작하기</DialogTitle>
             <DialogDescription>
-              Overview · Delivery · Systems · Signals 네 화면에 함께 반영됩니다.
+              운영 개요·빌드·배포·시스템·러너·운영 신호에 함께 반영됩니다.
             </DialogDescription>
           </DialogHeader>
           <div className="six-import-box">
@@ -163,8 +163,8 @@ export function DataConnect({ compact = false }: { compact?: boolean }) {
             )}
           </div>
           <p className="six-connect-note">
-            Explore의 확장 분석 화면은 예시 데이터입니다. 상세 로그와 외부
-            시스템 조회는 Connections에서 별도로 연결합니다.
+            프로젝트·비용·보안·인가 관리의 확장 화면은 예시 데이터입니다. 상세
+            로그와 외부 시스템 조회는 연동 설정에서 별도로 연결합니다.
           </p>
         </DialogContent>
       </Dialog>

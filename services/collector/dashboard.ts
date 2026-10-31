@@ -7,7 +7,13 @@ type ApiPipeline = {
   ref: string;
   created_at: string;
 };
-type ApiRunner = { id: number; paused: boolean; status: string };
+type ApiRunner = {
+  id: number;
+  paused: boolean;
+  status: string;
+  description?: string;
+  name?: string | null;
+};
 export type DashboardCollectorConfig = {
   baseUrl: string;
   token: string;
@@ -166,6 +172,16 @@ export async function collectDashboard(
     health: "unknown",
     daily,
     runners,
+    runnerDetails: [...runnerMap.values()].map((r) => ({
+      id: r.id,
+      name: r.description || r.name || `러너 ${r.id}`,
+      description: r.description || "",
+      status: r.paused
+        ? "paused"
+        : r.status === "online"
+          ? "online"
+          : "offline",
+    })),
     queueSeconds: null,
     pipelines,
     services: [],

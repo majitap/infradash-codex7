@@ -49,10 +49,10 @@ export function SignalInspector({
         <DialogHeader>
           <span className={`r7-priority ${signal?.severity}`}>
             {signal?.severity === "critical"
-              ? "PRIORITY 01 · REVIEW FIRST"
+              ? "우선순위 01 · 먼저 확인"
               : signal?.severity === "warning"
-                ? "PRIORITY 02 · INVESTIGATE"
-                : "OPPORTUNITY · OPTIMIZE"}
+                ? "우선순위 02 · 점검 필요"
+                : "개선 제안 · 최적화"}
           </span>
           <DialogTitle>{signal?.title}</DialogTitle>
           <DialogDescription>{signal?.detail}</DialogDescription>
@@ -61,7 +61,7 @@ export function SignalInspector({
           <>
             <div className="r7-runbook-heading">
               <ClipboardList size={17} />
-              <strong>A considered next move</strong>
+              <strong>다음 판단을 위한 확인</strong>
               <span>확인 가이드</span>
             </div>
             <div className="r7-runbook">
@@ -118,14 +118,14 @@ export function FocusQueue() {
   return (
     <section className="r7-focus-panel">
       <div className="r7-panel-header">
-        <SectionLabel>YOUR NEXT MOVE</SectionLabel>
+        <SectionLabel>지금 집중할 일</SectionLabel>
         <span className="r7-count">{pending.length}</span>
       </div>
       <div className="r7-focus-title">
         <h2>
-          Less noise.
+          중요한 신호에,
           <br />
-          <span>More direction.</span>
+          <span>분명한 다음 행동.</span>
         </h2>
         <p>지금 집중할 일을 먼저.</p>
       </div>
@@ -137,7 +137,7 @@ export function FocusQueue() {
           >
             <span className="r7-priority">
               <i />
-              REVIEW FIRST
+              먼저 확인
               <ArrowUpRight size={17} />
             </span>
             <strong>{first.title}</strong>
@@ -167,12 +167,12 @@ export function FocusQueue() {
       ) : (
         <div className="r7-all-clear">
           <CircleCheck size={32} />
-          <strong>A quieter workspace.</strong>
+          <strong>모든 신호를 확인했습니다.</strong>
           <p>현재 확인할 신호가 없습니다.</p>
         </div>
       )}
       <Link href="/incidents" className="r7-focus-footer">
-        Open signal inbox
+        운영 신호 전체 보기
         <ArrowUpRight size={14} />
       </Link>
       <SignalInspector signal={selected} onClose={() => setSelected(null)} />
@@ -198,8 +198,8 @@ export function SignalsView() {
   return (
     <div className="r7-page">
       <PageTitle
-        eyebrow="SIGNALS / DECISION SPACE"
-        title="Make room for what matters."
+        eyebrow="운영 신호 / 판단의 공간"
+        title="중요한 일에 집중하세요."
         description="신호를 분류하고, 확인하고, 다음 판단을 이어갑니다."
         actions={
           <ExportButton
@@ -212,24 +212,24 @@ export function SignalsView() {
       />
       <div className="r7-signal-summary">
         <div>
-          <span>OPEN SIGNALS</span>
+          <span>확인할 신호</span>
           <strong>
             {pending.length}
-            <small>to review</small>
+            <small>확인 필요</small>
           </strong>
         </div>
         <div>
-          <span>REQUIRES ATTENTION</span>
+          <span>우선 확인</span>
           <strong>
             {pending.filter((a) => a.severity === "critical").length}
-            <small>priority signals</small>
+            <small>우선순위 신호</small>
           </strong>
         </div>
         <div>
-          <span>REVIEWED</span>
+          <span>확인 완료</span>
           <strong>
             {acknowledged.length}
-            <small>this session</small>
+            <small>현재 접속 기준</small>
           </strong>
         </div>
         <div className="r7-inbox-art" aria-hidden="true">
@@ -241,17 +241,17 @@ export function SignalsView() {
       </div>
       <section className="r7-inbox-panel">
         <div className="r7-inbox-controls">
-          <h2>Signal inbox</h2>
+          <h2>운영 신호함</h2>
           <div
             className="r7-filter-tabs"
             role="group"
             aria-label="운영 신호 필터"
           >
             {[
-              { id: "open", label: "Open" },
-              { id: "critical", label: "Priority" },
-              { id: "reviewed", label: "Reviewed" },
-              { id: "all", label: "All" },
+              { id: "open", label: "확인 전" },
+              { id: "critical", label: "우선 확인" },
+              { id: "reviewed", label: "확인 완료" },
+              { id: "all", label: "전체" },
             ].map((f) => (
               <button
                 key={f.id}
@@ -276,12 +276,12 @@ export function SignalsView() {
                 <span>
                   <span className="r7-inbox-category">
                     {a.severity === "critical"
-                      ? "PRIORITY"
+                      ? "우선 확인"
                       : a.severity === "warning"
-                        ? "ATTENTION"
-                        : "OPPORTUNITY"}
+                        ? "점검 필요"
+                        : "개선 제안"}
                     <i />
-                    SIGNAL {String(i + 1).padStart(2, "0")}
+                    신호 {String(i + 1).padStart(2, "0")}
                   </span>
                   <strong>{a.title}</strong>
                   <span className="r7-inbox-description">{a.detail}</span>
@@ -299,7 +299,7 @@ export function SignalsView() {
                   <Check size={16} />
                 )}
                 <span>
-                  {acknowledged.includes(a.id) ? "Reviewed" : "Mark reviewed"}
+                  {acknowledged.includes(a.id) ? "확인 완료" : "확인 완료"}
                 </span>
               </button>
             </div>
@@ -307,7 +307,7 @@ export function SignalsView() {
         ) : (
           <div className="r7-empty">
             <ShieldCheck size={36} />
-            <h3>Nothing to review here.</h3>
+            <h3>확인할 신호가 없습니다.</h3>
             <p>이 조건에 맞는 신호가 없습니다.</p>
           </div>
         )}

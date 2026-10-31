@@ -112,6 +112,12 @@ test("읽기 수집기는 지정한 프로젝트만 조회하고 러너 중복�
     new Date("2026-11-01T02:00:00Z"),
   );
   assert.equal(result.runners.online, 1);
+  assert.equal(result.runnerDetails.length, 1);
+  assert.equal(result.runnerDetails[0].id, 7);
+  assert.equal(result.runnerDetails[0].status, "online");
+  assert.equal(result.runnerDetails[0].concurrent, null);
+  assert.equal(result.runnerDetails[0].cpuLoad, null);
+  assert.equal(result.runnerDetails[0].version, null);
   assert.equal(result.daily.at(-1)?.success, 2);
   assert.equal(result.license, null);
   assert.equal(result.queueSeconds, null);
