@@ -70,7 +70,7 @@ export function servicePositions(services: RelayService[]) {
       [282, 182],
       [486, 104],
       [486, 264],
-      [700, 70],
+      [700, 86],
       [700, 182],
       [700, 294],
       [282, 324],
